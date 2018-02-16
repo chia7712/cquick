@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ ! (-n "$HBASE_BRANCH") || ! (-n "$HBASE_ASSEMBLY") ]; then
+  echo "Define the HBASE_BRANCH and HBASE_ASSEMBLY"
+  exit
+fi
 # generate ssh key
 ssh-keygen -t rsa -P '' -f $HOME/.ssh/id_rsa
 cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
@@ -18,15 +22,11 @@ ssh localhost -o StrictHostKeyChecking=no "export"
 ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 # generate hbase
+ASSEMBLY_NAME=""
 cd /testpatch/hbase
 git checkout -- . | git clean -df
-if [ -n "$HBASE_BRANCH" ]; then
-  echo "checkout to $HBASE_BRANCH"
-  git checkout $HBASE_BRANCH
-else
-  echo "HBASE_BRANCH is unset, checkout to master"
-  git checkout master
-fi
+echo "checkout to $HBASE_BRANCH"
+git checkout $HBASE_BRANCH
 git pull
 if [ -f /testpatch/patch ]; then
   git apply /testpatch/patch --stat
@@ -35,21 +35,24 @@ else
   echo "no patch file"
 fi
 mvn clean install -DskipTests assembly:single
-tar -zxvf /testpatch/hbase/hbase-assembly/target/hbase-3.0.0-SNAPSHOT-bin.tar.gz -C $HOME/
+tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY-bin.tar.gz -C $HOME/
+mv $HOME/$HBASE_ASSEMBLY $HOME/hbase
 
 # build hpref
-cd $HPREF_HOME
+cd $USER_HOME
+git clone https://github.com/chia7712/hpref.git
+cd $USER_HOME/hpref
 gradle clean build -x test -q copyDeps
 
 # deploy hadoop's config
-cp $HPREF_HOME/conf/hadoop/* $HADOOP_HOME/etc/hadoop/
+cp $HQUICK_HOME/conf/hadoop/* $HADOOP_HOME/etc/hadoop/
 
 # start hadoop
 $HADOOP_HOME/bin/hdfs namenode -format
 $HADOOP_HOME/sbin/start-dfs.sh
 
 # deploy hbase's config
-cp $HPREF_HOME/conf/hbase/* $HBASE_HOME/conf/
+cp $HQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
 
 # start hbase
 $HBASE_HOME/bin/start-hbase.sh
