@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ ! (-n "$HBASE_BRANCH") || ! (-n "$HBASE_ASSEMBLY") ]; then
+if [ ! -n "$HBASE_BRANCH" ] || [ ! -n "$HBASE_ASSEMBLY" ]; then
   echo "Define the HBASE_BRANCH and HBASE_ASSEMBLY"
   exit
 fi
