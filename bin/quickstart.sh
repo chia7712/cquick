@@ -39,9 +39,9 @@ tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY-bin.tar.gz -C $
 mv $HOME/$HBASE_ASSEMBLY $HOME/hbase
 
 # build hperf
-cd $USER_HOME
+cd $HOME
 git clone https://github.com/chia7712/hperf.git
-cd $USER_HOME/hperf
+cd $HOME/hperf
 if [ -n "$HPERF_BRANCH" ]; then
   git checkout $HPERF_BRANCH
 else
