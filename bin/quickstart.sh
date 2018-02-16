@@ -42,6 +42,12 @@ mv $HOME/$HBASE_ASSEMBLY $HOME/hbase
 cd $USER_HOME
 git clone https://github.com/chia7712/hperf.git
 cd $USER_HOME/hperf
+if [ -n "$HPERF_BRANCH" ]; then
+  git checkout $HPERF_BRANCH
+else
+  echo "HPERF_BRANCH is unset. Use master branch instead"
+  git checkout master
+fi
 gradle clean build -x test -q copyDeps
 
 # deploy hadoop's config
