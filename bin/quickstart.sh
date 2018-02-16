@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-if [ ! -n "$HBASE_BRANCH" ] || [ ! -n "$HBASE_ASSEMBLY" ]; then
-  echo "Define the HBASE_BRANCH and HBASE_ASSEMBLY"
-  exit
-fi
 # generate ssh key
 ssh-keygen -t rsa -P '' -f $HOME/.ssh/id_rsa
 cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
@@ -22,21 +18,35 @@ ssh localhost -o StrictHostKeyChecking=no "export"
 ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 # generate hbase
-ASSEMBLY_NAME=""
-cd /testpatch/hbase
-git checkout -- . | git clean -df
-echo "checkout to $HBASE_BRANCH"
-git checkout $HBASE_BRANCH
-git pull
-if [ -f /testpatch/patch ]; then
-  git apply /testpatch/patch --stat
-  git apply /testpatch/patch
+if [ -n "$HBASE_RELEASE" ]; then
+  if [ ! -n "$HBASE_ASSEMBLY" ]; then
+    echo "Define the HBASE_ASSEMBLY"
+    exit
+  fi
+  cd $HOME
+  wget $HBASE_RELEASE
+  tar -zxvf $HBASE_ASSEMBLY
 else
-  echo "no patch file"
+  if [ ! -n "$HBASE_BRANCH" ] || [ ! -n "$HBASE_ASSEMBLY" ]; then
+    echo "Define the HBASE_BRANCH and HBASE_ASSEMBLY"
+    exit
+  fi
+  cd /testpatch/hbase
+  git checkout -- . | git clean -df
+  echo "checkout to $HBASE_BRANCH"
+  git checkout $HBASE_BRANCH
+  git pull
+  if [ -f /testpatch/patch ]; then
+    git apply /testpatch/patch --stat
+    git apply /testpatch/patch
+  else
+    echo "no patch file"
+  fi
+  mvn clean install -DskipTests assembly:single
+  tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY-bin.tar.gz -C $HOME/
 fi
-mvn clean install -DskipTests assembly:single
-tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY-bin.tar.gz -C $HOME/
 mv $HOME/$HBASE_ASSEMBLY $HOME/hbase
+
 
 # build hperf
 cd $HOME
