@@ -38,10 +38,10 @@ mvn clean install -DskipTests assembly:single
 tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY-bin.tar.gz -C $HOME/
 mv $HOME/$HBASE_ASSEMBLY $HOME/hbase
 
-# build hpref
+# build hperf
 cd $USER_HOME
-git clone https://github.com/chia7712/hpref.git
-cd $USER_HOME/hpref
+git clone https://github.com/chia7712/hperf.git
+cd $USER_HOME/hperf
 gradle clean build -x test -q copyDeps
 
 # deploy hadoop's config
