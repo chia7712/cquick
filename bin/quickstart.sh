@@ -24,8 +24,9 @@ if [ -n "$HBASE_RELEASE" ]; then
     exit
   fi
   cd $HOME
+  mkdir hbase
   wget $HBASE_RELEASE
-  tar -zxvf $HBASE_ASSEMBLY
+  tar -zxvf $HBASE_ASSEMBLY -C $HOME/hbase --strip-components 1
 else
   if [ ! -n "$HBASE_BRANCH" ] || [ ! -n "$HBASE_ASSEMBLY" ]; then
     echo "Define the HBASE_BRANCH and HBASE_ASSEMBLY"
@@ -43,9 +44,9 @@ else
     echo "no patch file"
   fi
   mvn clean install -DskipTests assembly:single
-  tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY-bin.tar.gz -C $HOME/
+  mkdir $HOME/hbase
+  tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY -C $HOME/hbase --strip-components 1
 fi
-mv $HOME/$HBASE_ASSEMBLY $HOME/hbase
 
 
 # build hperf
