@@ -19,17 +19,14 @@ ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 # generate hbase
 if [ -n "$HBASE_RELEASE" ]; then
-  if [ ! -n "$HBASE_ASSEMBLY" ]; then
-    echo "Define the HBASE_ASSEMBLY"
-    exit
-  fi
+  filename=$(basename "$HBASE_RELEASE")
   cd $HOME
   mkdir hbase
   wget $HBASE_RELEASE
-  tar -zxvf $HBASE_ASSEMBLY -C $HOME/hbase --strip-components 1
+  tar -zxvf $filename -C $HOME/hbase --strip-components 1
 else
-  if [ ! -n "$HBASE_BRANCH" ] || [ ! -n "$HBASE_ASSEMBLY" ]; then
-    echo "Define the HBASE_BRANCH and HBASE_ASSEMBLY"
+  if [ ! -n "$HBASE_BRANCH" ]; then
+    echo "Define the HBASE_BRANCH"
     exit
   fi
   cd /testpatch/hbase
@@ -44,8 +41,9 @@ else
     echo "no patch file"
   fi
   mvn clean install -DskipTests assembly:single
+  filename=$(find "/testpatch/hbase/hbase-assembly/target/" -type f -name "*.gz")
   mkdir $HOME/hbase
-  tar -zxvf /testpatch/hbase/hbase-assembly/target/$HBASE_ASSEMBLY -C $HOME/hbase --strip-components 1
+  tar -zxvf $filename -C $HOME/hbase --strip-components 1
 fi
 
 
