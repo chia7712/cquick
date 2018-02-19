@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ ! -n "$HBASE_BRANCH" ]; then
+  echo "Define the HBASE_BRANCH. You can pass the url to source code also"
+  exit
+fi
 # generate ssh key
 ssh-keygen -t rsa -P '' -f $HOME/.ssh/id_rsa
 cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
@@ -18,17 +22,14 @@ ssh localhost -o StrictHostKeyChecking=no "export"
 ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 # generate hbase
-if [ -n "$HBASE_RELEASE" ]; then
-  filename=$(basename "$HBASE_RELEASE")
+
+if [[ "${HBASE_BRANCH}" == http* ]]; then
+  filename=$(basename "$HBASE_BRANCH")
   cd $HOME
   mkdir hbase
-  wget $HBASE_RELEASE
+  wget $HBASE_BRANCH
   tar -zxvf $filename -C $HOME/hbase --strip-components 1
 else
-  if [ ! -n "$HBASE_BRANCH" ]; then
-    echo "Define the HBASE_BRANCH"
-    exit
-  fi
   cd /testpatch/hbase
   git checkout -- . | git clean -df
   echo "checkout to $HBASE_BRANCH"
