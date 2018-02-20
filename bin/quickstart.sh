@@ -12,11 +12,6 @@ chmod 0600 $HOME/.ssh/authorized_keys
 # start ssh service
 /etc/init.d/ssh start
 
-# set Env
-echo "export HADOOP_HOME=$HADOOP_HOME" >> $HOME/.bashrc
-echo "export HBASE_HOME=$HBASE_HOME" >> $HOME/.bashrc
-echo "export JAVA_HOME=$JAVA_HOME" >> $HOME/.bashrc
-
 # list the env variables
 ssh localhost -o StrictHostKeyChecking=no "export"
 ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
@@ -25,10 +20,9 @@ ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 if [[ "${HBASE_BRANCH}" == http* ]]; then
   filename=$(basename "$HBASE_BRANCH")
-  cd $HOME
-  mkdir hbase
   wget $HBASE_BRANCH
-  tar -zxvf $filename -C $HOME/hbase --strip-components 1
+  tar -zxvf $filename -C $COMPONENT_HOME
+  rm -f $filename
 else
   cd /testpatch/hbase
   git checkout -- . | git clean -df
@@ -43,10 +37,15 @@ else
   fi
   mvn clean install -DskipTests assembly:single
   filename=$(find "/testpatch/hbase/hbase-assembly/target/" -type f -name "*.gz")
-  mkdir $HOME/hbase
-  tar -zxvf $filename -C $HOME/hbase --strip-components 1
+  tar -zxvf $filename -C $COMPONENT_HOME
 fi
-
+HBASE_HOME=$(find "$COMPONENT_HOME" -type d -name "hbase-*")
+HADOOP_HOME=$COMPONENT_HOME/hadoop-2.7.4
+# set Env
+echo "export HADOOP_HOME=$HADOOP_HOME" >> $HOME/.bashrc
+echo "export HBASE_HOME=$HBASE_HOME" >> $HOME/.bashrc
+echo "export JAVA_HOME=$JAVA_HOME" >> $HOME/.bashrc
+echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin:\$HBASE_HOME/bin" >> $HOME/.bashrc
 
 # build hperf
 cd $HOME
