@@ -36,10 +36,10 @@ else
     echo "no patch file"
   fi
   mvn clean install -DskipTests assembly:single
-  filename=$(find "/testpatch/hbase/hbase-assembly/target/" -type f -name "*.gz")
+  filename=$(find "/testpatch/hbase/hbase-assembly/target/" -type f -maxdepth 1 -name "*.gz")
   tar -zxvf $filename -C $COMPONENT_HOME
 fi
-HBASE_HOME=$(find "$COMPONENT_HOME" -type d -name "hbase-*")
+HBASE_HOME=$(find "$COMPONENT_HOME" -type d -maxdepth 1 -name "hbase-*")
 HADOOP_HOME=$COMPONENT_HOME/hadoop-2.7.4
 # set Env
 echo "export HADOOP_HOME=$HADOOP_HOME" >> $HOME/.bashrc
