@@ -16,12 +16,12 @@ chmod 0600 $HOME/.ssh/authorized_keys
 ssh localhost -o StrictHostKeyChecking=no "export"
 ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
-# generate hbase
-
+# generate hbase binary
+mkdir /opt/hbase
 if [[ "${HBASE_BRANCH}" == http* ]]; then
   filename=$(basename "$HBASE_BRANCH")
   wget $HBASE_BRANCH
-  tar -zxvf $filename -C $COMPONENT_HOME
+  tar -zxvf $filename -C /opt/hbase
   rm -f $filename
 else
   cd /testpatch/hbase
@@ -37,10 +37,24 @@ else
   fi
   mvn clean install -DskipTests assembly:single
   filename=$(find "/testpatch/hbase/hbase-assembly/target/" -type f -maxdepth 1 -name "*.gz")
-  tar -zxvf $filename -C $COMPONENT_HOME
+  tar -zxvf $filename -C /opt/hbase
 fi
-HBASE_HOME=$(find "$COMPONENT_HOME" -type d -maxdepth 1 -name "hbase-*")
-HADOOP_HOME=$COMPONENT_HOME/hadoop-2.7.4
+
+# set hbase home
+HBASE_ASSEMBLY=$(find "/opt/hbase" -type d -maxdepth 1 -name "hbase-*")
+ln -s $HBASE_ASSEMBLY /opt/hbase/default
+HBASE_HOME=/opt/hbase/default
+
+# set hadoop home
+# Downloading the dist hadoop is too slow so the dist hadoop has been download to docker image
+OLD_HADOOP=$(find "$HBASE_HOME/lib/" -type f -maxdepth 1 -name "hadoop-*2.5*")
+if [ -n "$OLD_HADOOP" ]; then
+  ln -s /opt/hadoop/hadoop-2.5.1 /opt/hadoop/default
+else
+  ln -s /opt/hadoop/hadoop-2.7.4 /opt/hadoop/default
+fi
+HADOOP_HOME=/opt/hadoop/default
+
 # set Env
 echo "export HADOOP_HOME=$HADOOP_HOME" >> $HOME/.bashrc
 echo "export HBASE_HOME=$HBASE_HOME" >> $HOME/.bashrc
@@ -48,8 +62,8 @@ echo "export JAVA_HOME=$JAVA_HOME" >> $HOME/.bashrc
 echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin:\$HBASE_HOME/bin" >> $HOME/.bashrc
 
 # build hperf
-cd $HOME
-git clone https://github.com/chia7712/hperf.git
+mkdir $COMPONENT_HOME/hperf
+git clone https://github.com/chia7712/hperf.git $COMPONENT_HOME/hperf
 
 # deploy hadoop's config
 cp $HQUICK_HOME/conf/hadoop/* $HADOOP_HOME/etc/hadoop/

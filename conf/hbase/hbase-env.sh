@@ -25,10 +25,10 @@
 # into the startup scripts (bin/hbase, etc.)
 
 # The java implementation to use.  Java 1.8+ required.
-# export JAVA_HOME=/usr/lib/jvm/default-java
+export JAVA_HOME=/opt/java/default
 
 # Extra Java CLASSPATH elements.  Optional.
-export HBASE_CLASSPATH=$HADOOP_HOME/lib/native/
+export HBASE_CLASSPATH=/opt/hadoop/default/lib/native/
 
 # The maximum amount of heap to use. Default is left to JVM default.
 # export HBASE_HEAPSIZE=16G
