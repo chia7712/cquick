@@ -54,6 +54,13 @@ else
   # we will build the source later
 fi
 
+echo "[DEBUG] $sourcepath"
+if [ ! -z ${sourcepath+x} ]; then
+ echo "[DEBUG] sourcepath is unset"
+else
+ echo "[DEBUG] sourcepath is set"
+fi
+
 # build the binary by source
 if [ ! -z ${sourcepath+x} ] && [ -d "$sourcepath" ]; then
   cd $sourcepath
