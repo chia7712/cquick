@@ -67,7 +67,7 @@ if [ -d "$sourcepath" ]; then
 fi
   
 # set kafka home
-KAFKA_ASSEMBLY=$(find "/opt/kafka" -maxdepth 1 -type d -name "kafka*SNAPSHOT")
+KAFKA_ASSEMBLY=$(find "/opt/kafka/" -maxdepth 1 -type d -name "kafka_*")
 ln -s $KAFKA_ASSEMBLY /opt/kafka/default
 KAFKA_HOME=/opt/kafka/default
 
@@ -83,8 +83,12 @@ cp $CQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
 # start zookeeper
 $ZOOKEEPER_HOME/bin/zkServer.sh start
 
+# deploy zookeeper config
+cp $CQUICK_HOME/conf/kafka/* $KAFKA_HOME/config/
+
 # START kafka
 # TODO: just run the kafka server in the background
-$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties > /dev/null 2>&1 &
-
+$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server0.properties > /dev/null 2>&1 &
+$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server1.properties > /dev/null 2>&1 &
+$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /dev/null 2>&1 &
 exec bash
