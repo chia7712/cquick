@@ -44,7 +44,6 @@ fi
 
 # set kafka home
 KAFKA_ASSEMBLY=$(find "/opt/kafka" -maxdepth 1 -type d -name "kafka*SNAPSHOT")
-echo "[DEBUG] $KAFKA_ASSEMBLY"
 ln -s $KAFKA_ASSEMBLY /opt/kafka/default
 KAFKA_HOME=/opt/kafka/default
 
@@ -61,6 +60,6 @@ cp $HQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
 $ZOOKEEPER_HOME/bin/zkServer.sh start
 
 # START kafka
-$KAFKA_HOME/bin/afka-server-start.sh $KAFKA_HOME/config/server.properties
+$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties
 
 exec bash
