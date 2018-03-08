@@ -56,10 +56,11 @@ fi
 HADOOP_HOME=/opt/hadoop/default
 
 # set Env
+echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> $HOME/.bashrc
 echo "export HADOOP_HOME=$HADOOP_HOME" >> $HOME/.bashrc
 echo "export HBASE_HOME=$HBASE_HOME" >> $HOME/.bashrc
 echo "export JAVA_HOME=$JAVA_HOME" >> $HOME/.bashrc
-echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin:\$HBASE_HOME/bin" >> $HOME/.bashrc
+echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin:\$HBASE_HOME/bin:\$ZOOKEEPER_HOME/bin" >> $HOME/.bashrc
 
 # build hperf
 mkdir $COMPONENT_HOME/hperf
