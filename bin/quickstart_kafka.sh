@@ -25,21 +25,18 @@ if [[ "${KAFKA_BRANCH}" == http* ]]; then
   wget $KAFKA_BRANCH -P /tmp
   distname=$(basename "$KAFKA_BRANCH")
   distpath=/tmp/$distname
-  if [[ "${distname}" == *bin* ]]; then
-    echo "[DEBUG] do binary"
-    # use the dist binary
-	tar -zxf $distpath -C /opt/kafka
-    rm -f $distpath
-  else
-    echo "[DEBUG] do src"
+  if [[ "${distname}" == *src* ]]; then
     # prepare the source code
     tar -zxf $distpath -C /tmp/
 	rm -f $distpath
 	sourcepath=$(find "/tmp/" -maxdepth 1 -type d -name "kafka*")
 	# we will build the source later
+  else
+    # use the dist binary
+	tar -zxf $distpath -C /opt/kafka
+    rm -f $distpath
   fi
 else
-  echo "[DEBUG] do source"
   # if the father docker has download the kafka source code, we use it directly.
   if [ -d "$KAFKA_SOURCE" ]; then
     sourcepath=$KAFKA_SOURCE
@@ -58,13 +55,6 @@ else
     echo "no patch file"
   fi
   # we will build the source later
-fi
-
-echo "[DEBUG] $sourcepath"
-if [ -z ${sourcepath+x} ]; then
- echo "[DEBUG] sourcepath is set"
-else
- echo "[DEBUG] sourcepath is unset"
 fi
 
 # build the binary by source
