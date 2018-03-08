@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 
 #------------------------------------[check the arguments]------------------------------------#
-if [ ! -n "$BRANCH" ] || [ ! -n "$PROJECT" ]; then
-  echo "YOU must define the BRANCH and PROJECT"
-  echo "[BRANCH] 1) url to src or binary. 2) git revision or branch"
-  echo "[PROJECT] 1) hbase 2) kafka"
+if [ ! -n "$BRANCH" ]; then
+  echo "YOU must define the BRANCH"
+  echo "1) url to src or binary."
+  echo "2) git revision or branch"
   exit
+fi
+
+if [ ! -n "$PROJECT" ]; then
+  if [[ "${BRANCH}" == *kafka* ]]; then
+    PROJECT="kafka"
+  elif [[ "${BRANCH}" == *hbase* ]]; then
+    PROJECT="hbase"
+  else
+    echo "YOU don't set PROJECT, and we can't guess the project according to the BRANCH:$BRANCH"
+  fi
 fi
 
 if [ "$PROJECT" != "kafka" ] && [ "$PROJECT" != "hbase" ]; then
