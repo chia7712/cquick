@@ -24,15 +24,16 @@ if [[ "${HBASE_BRANCH}" == http* ]]; then
   distpath=/tmp/$distname
   if [[ "${distname}" == *bin* ]]; then
 	tar -zxvf $distpath -C /opt/hbase
+    rm -f $distpath
   else
     tar -zxvf $distpath -C /tmp/
+	rm -f $distpath
 	sourcepath=$(find "/tmp/" -maxdepth 1 -type f -name "hbase*")
 	cd $sourcepath
 	mvn clean install -DskipTests assembly:single
     binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
     tar -zxvf $binarypath -C /opt/hbase
   fi
-  rm -f $distpath
 else
   sourcepath=""
   # if the father docker has download the hbase source code, we use it directly.
