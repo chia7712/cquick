@@ -4,17 +4,6 @@ if [ ! -n "$HBASE_BRANCH" ]; then
   echo "Define the HBASE_BRANCH. You can pass the URL to source code also"
   exit
 fi
-# generate ssh key
-ssh-keygen -t rsa -P '' -f $HOME/.ssh/id_rsa
-cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
-chmod 0600 $HOME/.ssh/authorized_keys
-
-# start ssh service
-/etc/init.d/ssh start
-
-# list the env variables
-ssh localhost -o StrictHostKeyChecking=no "export"
-ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 if [ ! -d "/opt/hbase" ]; then
   mkdir /opt/hbase
@@ -104,12 +93,14 @@ cp $CQUICK_HOME/conf/hadoop/* $HADOOP_HOME/etc/hadoop/
 
 # start hadoop
 $HADOOP_HOME/bin/hdfs namenode -format
-$HADOOP_HOME/sbin/start-dfs.sh
+$HADOOP_HOME/sbin/hadoop-daemon.sh start namenode
+$HADOOP_HOME/sbin/hadoop-daemon.sh start datanode
 
 # deploy hbase's config
 cp $CQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
 
 # start hbase
-$HBASE_HOME/bin/start-hbase.sh
+$HBASE_HOME/bin/hbase-daemon.sh start master
+$HBASE_HOME/bin/hbase-daemon.sh start regionserver
 
 exec bash
