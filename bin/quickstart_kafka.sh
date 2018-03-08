@@ -53,8 +53,9 @@ else
   fi
   # we will build the source later
 fi
+
 # build the binary by source
-if [ -d "$sourcepath" ]; then
+if [ ! -z ${sourcepath+x} ] && [ -d "$sourcepath" ]; then
   cd $sourcepath
   gradle
   ./gradlew clean
@@ -65,7 +66,7 @@ if [ -d "$sourcepath" ]; then
   cd ~/
   rm -rf $sourcepath
 fi
-  
+
 # set kafka home
 KAFKA_ASSEMBLY=$(find "/opt/kafka/" -maxdepth 1 -type d -name "kafka_*")
 ln -s $KAFKA_ASSEMBLY /opt/kafka/default
@@ -87,7 +88,7 @@ $ZOOKEEPER_HOME/bin/zkServer.sh start
 cp $CQUICK_HOME/conf/kafka/* $KAFKA_HOME/config/
 
 # START kafka
-# TODO: just run the kafka server in the background
+# TODO: just run the kafka server in the background?
 $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server0.properties > /dev/null 2>&1 &
 $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server1.properties > /dev/null 2>&1 &
 $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /dev/null 2>&1 &
