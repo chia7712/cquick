@@ -41,7 +41,7 @@ else
 fi
 
 # set hbase home
-HBASE_ASSEMBLY=$(find "/opt/hbase" -type d -maxdepth 1 -name "hbase-*")
+HBASE_ASSEMBLY=$(find "/opt/hbase" -maxdepth 1 -type d -name "hbase-*")
 ln -s $HBASE_ASSEMBLY /opt/hbase/default
 HBASE_HOME=/opt/hbase/default
 
