@@ -18,6 +18,7 @@ ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 # generate hbase binary
 mkdir /opt/hbase
+sourcepath=""
 if [[ "${HBASE_BRANCH}" == http* ]]; then
   wget $HBASE_BRANCH -P /tmp
   distname=$(basename "$HBASE_BRANCH")
@@ -27,19 +28,13 @@ if [[ "${HBASE_BRANCH}" == http* ]]; then
 	tar -zxvf $distpath -C /opt/hbase
     rm -f $distpath
   else
-    # build the binary from dist source
+    # prepare the source code
     tar -zxvf $distpath -C /tmp/
 	rm -f $distpath
 	sourcepath=$(find "/tmp/" -maxdepth 1 -type d -name "hbase*")
-	cd $sourcepath
-	mvn clean install -DskipTests assembly:single
-    binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
-    tar -zxvf $binarypath -C /opt/hbase
-	cd ~/
-	rm -rf $sourcepath
+	# we will build the source later
   fi
 else
-  sourcepath=""
   # if the father docker has download the hbase source code, we use it directly.
   if [ -d "$HBASE_SOURCE" ]; then
     sourcepath=$HBASE_SOURCE
@@ -57,6 +52,12 @@ else
   else
     echo "no patch file"
   fi
+  # we will build the source later
+fi
+
+# build the binary by source
+if [ -d "$sourcepath" ]; then
+  cd $sourcepath
   mvn clean install -DskipTests assembly:single
   binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
   tar -zxvf $binarypath -C /opt/hbase
