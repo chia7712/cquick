@@ -92,20 +92,20 @@ mkdir $COMPONENT_HOME/hperf
 git clone https://github.com/chia7712/hperf.git $COMPONENT_HOME/hperf
 
 # deploy zookeeper config
-cp $HQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
+cp $CQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
 
 # start zookeeper
 $ZOOKEEPER_HOME/bin/zkServer.sh start
 
 # deploy hadoop config
-cp $HQUICK_HOME/conf/hadoop/* $HADOOP_HOME/etc/hadoop/
+cp $CQUICK_HOME/conf/hadoop/* $HADOOP_HOME/etc/hadoop/
 
 # start hadoop
 $HADOOP_HOME/bin/hdfs namenode -format
 $HADOOP_HOME/sbin/start-dfs.sh
 
 # deploy hbase's config
-cp $HQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
+cp $CQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
 
 # start hbase
 $HBASE_HOME/bin/start-hbase.sh
