@@ -16,17 +16,22 @@ chmod 0600 $HOME/.ssh/authorized_keys
 ssh localhost -o StrictHostKeyChecking=no "export"
 ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
+if [ ! -d "/opt/kafka" ]; then
+  mkdir /opt/kafka
+fi
+
 # generate kafka binary
-mkdir /opt/kafka
 if [[ "${KAFKA_BRANCH}" == http* ]]; then
   wget $KAFKA_BRANCH -P /tmp
   distname=$(basename "$KAFKA_BRANCH")
   distpath=/tmp/$distname
   if [[ "${distname}" == *bin* ]]; then
+    echo "[DEBUG] do binary"
     # use the dist binary
 	tar -zxvf $distpath -C /opt/kafka
     rm -f $distpath
   else
+    echo "[DEBUG] do src"
     # prepare the source code
     tar -zxvf $distpath -C /tmp/
 	rm -f $distpath
@@ -34,6 +39,7 @@ if [[ "${KAFKA_BRANCH}" == http* ]]; then
 	# we will build the source later
   fi
 else
+  echo "[DEBUG] do source"
   # if the father docker has download the kafka source code, we use it directly.
   if [ -d "$KAFKA_SOURCE" ]; then
     sourcepath=$KAFKA_SOURCE
@@ -55,10 +61,10 @@ else
 fi
 
 echo "[DEBUG] $sourcepath"
-if [ ! -z ${sourcepath+x} ]; then
- echo "[DEBUG] sourcepath is unset"
-else
+if [ -z ${sourcepath+x} ]; then
  echo "[DEBUG] sourcepath is set"
+else
+ echo "[DEBUG] sourcepath is unset"
 fi
 
 # build the binary by source
