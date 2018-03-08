@@ -1,20 +1,9 @@
 #!/usr/bin/env bash
 
 if [ ! -n "$KAFKA_BRANCH" ]; then
-  echo "Define the KAFKA_BRANCH. You can pass the URL to source code also"
+  echo "Define the KAFKA_BRANCH. You can pass the URL to source code"
   exit
 fi
-# generate ssh key
-ssh-keygen -t rsa -P '' -f $HOME/.ssh/id_rsa
-cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
-chmod 0600 $HOME/.ssh/authorized_keys
-
-# start ssh service
-/etc/init.d/ssh start
-
-# list the env variables
-ssh localhost -o StrictHostKeyChecking=no "export"
-ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
 if [ ! -d "/opt/kafka" ]; then
   mkdir /opt/kafka

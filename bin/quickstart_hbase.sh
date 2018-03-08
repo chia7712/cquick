@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ ! -n "$HBASE_BRANCH" ]; then
-  echo "Define the HBASE_BRANCH. You can pass the URL to source code also"
+  echo "Define the HBASE_BRANCH. You can pass the URL to source code"
   exit
 fi
 
@@ -103,4 +103,5 @@ cp $CQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
 $HBASE_HOME/bin/hbase-daemon.sh start master
 $HBASE_HOME/bin/hbase-daemon.sh start regionserver
 
+echo "[DEBUG] $USER"
 exec bash

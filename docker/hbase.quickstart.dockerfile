@@ -7,3 +7,5 @@ RUN git clone https://github.com/chia7712/cquick.git $COMPONENT_HOME/cquick
 # Set ENV
 ENV CQUICK_HOME=$COMPONENT_HOME/cquick
 ENV PATH=$PATH:$CQUICK_HOME/bin
+# TODO: use another name instrad?
+ENV USER=root
