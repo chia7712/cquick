@@ -38,7 +38,7 @@ else
   gradle
   ./gradlew clean
   ./gradlew releaseTarGz -x signArchives
-  filename=$(find "$KAFKA_SOURCE/core/build/distributions/" -type f -maxdepth 1 -name "*SNAPSHOT.tgz")
+  filename=$(find "$KAFKA_SOURCE/core/build/distributions/" -maxdepth 1 -type f -name "*SNAPSHOT.tgz")
   tar -zxvf $filename -C /opt/kafka
 fi
 

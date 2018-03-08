@@ -36,7 +36,7 @@ else
     echo "no patch file"
   fi
   mvn clean install -DskipTests assembly:single
-  filename=$(find "$HBASE_SOURCE/hbase-assembly/target/" -type f -maxdepth 1 -name "*.gz")
+  filename=$(find "$HBASE_SOURCE/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
   tar -zxvf $filename -C /opt/hbase
 fi
 
@@ -47,7 +47,7 @@ HBASE_HOME=/opt/hbase/default
 
 # set hadoop home
 # Downloading the dist hadoop is too slow so the dist hadoop has been download to docker image
-OLD_HADOOP=$(find "$HBASE_HOME/lib/" -type f -maxdepth 1 -name "hadoop-*2.5*")
+OLD_HADOOP=$(find "$HBASE_HOME/lib/" -maxdepth 1 -type f -name "hadoop-*2.5*")
 if [ -n "$OLD_HADOOP" ]; then
   ln -s /opt/hadoop/hadoop-2.5.1 /opt/hadoop/default
 else
