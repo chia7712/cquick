@@ -59,7 +59,8 @@ if [ -d "$sourcepath" ]; then
   gradle
   ./gradlew clean
   ./gradlew releaseTarGz -x signArchives
-  binarypath=$(find "$sourcepath/core/build/distributions/" -maxdepth 1 -type f -name "*.tgz")
+  # kafak assembly includes the *site-docs*.tgz
+  binarypath=$(find "$sourcepath/core/build/distributions/" -maxdepth 1 -type f -name "*.tgz" -not -path "*site*")
   tar -zxvf $binarypath -C /opt/kafka
   cd ~/
   rm -rf $sourcepath
