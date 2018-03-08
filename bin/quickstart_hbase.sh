@@ -28,6 +28,7 @@ if [[ "${HBASE_BRANCH}" == http* ]]; then
   else
     tar -zxvf $distpath -C /tmp/
 	rm -f $distpath
+	ls /tmp/
 	sourcepath=$(find "/tmp/" -maxdepth 1 -type f -name "hbase*")
 	cd $sourcepath
 	mvn clean install -DskipTests assembly:single
