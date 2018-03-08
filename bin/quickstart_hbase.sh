@@ -19,11 +19,24 @@ ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 # generate hbase binary
 mkdir /opt/hbase
 if [[ "${HBASE_BRANCH}" == http* ]]; then
-  filename=$(basename "$HBASE_BRANCH")
-  wget $HBASE_BRANCH
-  tar -zxvf $filename -C /opt/hbase
-  rm -f $filename
+  distname=$(basename "$HBASE_BRANCH")
+  wget $HBASE_BRANCH -P /tmp
+  if [[ "${distname}" == *bin* ]]; then
+	tar -zxvf /tmp/$distname -C /opt/hbase
+  else
+    tar -zxvf $distname -C /tmp/
+	sourcename=$(find "/tmp/" -maxdepth 1 -type f -name "hbase*")
+	cd $sourcename
+	mvn clean install -DskipTests assembly:single
+    filename=$(find "$sourcename/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
+    tar -zxvf $filename -C /opt/hbase
+  fi
+  rm -f /tmp/$distname
 else
+  if [ ! -d "$HBASE_SOURCE" ]; then
+    mkdir $HBASE_SOURCE
+	git clone https://github.com/apache/hbase $HBASE_SOURCE
+  fi
   cd $HBASE_SOURCE
   git checkout -- . | git clean -df
   echo "checkout to $HBASE_BRANCH"
