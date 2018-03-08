@@ -23,17 +23,20 @@ if [[ "${HBASE_BRANCH}" == http* ]]; then
   distname=$(basename "$HBASE_BRANCH")
   distpath=/tmp/$distname
   if [[ "${distname}" == *bin* ]]; then
+    # use the dist binary
 	tar -zxvf $distpath -C /opt/hbase
     rm -f $distpath
   else
+    # build the binary from dist source
     tar -zxvf $distpath -C /tmp/
 	rm -f $distpath
-	ls /tmp/
 	sourcepath=$(find "/tmp/" -maxdepth 1 -type d -name "hbase*")
 	cd $sourcepath
 	mvn clean install -DskipTests assembly:single
     binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
     tar -zxvf $binarypath -C /opt/hbase
+	cd ~/
+	rm -rf $sourcepath
   fi
 else
   sourcepath=""
