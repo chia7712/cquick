@@ -146,7 +146,7 @@ else
   fi
   cd $sourcepath
   git checkout -- . | git clean -df
-  git checkout $KAFKA_BRANCH
+  git checkout $BRANCH
   git pull
   if [ -f /testpatch/patch ]; then
     git apply /testpatch/patch --stat
