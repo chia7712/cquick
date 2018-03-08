@@ -16,23 +16,25 @@ chmod 0600 $HOME/.ssh/authorized_keys
 ssh localhost -o StrictHostKeyChecking=no "export"
 ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 
+if [ ! -d "/opt/hbase" ]; then
+  mkdir /opt/hbase
+fi
+
 # generate hbase binary
-mkdir /opt/hbase
-sourcepath=""
 if [[ "${HBASE_BRANCH}" == http* ]]; then
   wget $HBASE_BRANCH -P /tmp
   distname=$(basename "$HBASE_BRANCH")
   distpath=/tmp/$distname
-  if [[ "${distname}" == *bin* ]]; then
-    # use the dist binary
-	tar -zxvf $distpath -C /opt/hbase
-    rm -f $distpath
-  else
+  if [[ "${distname}" == *src* ]]; then
     # prepare the source code
-    tar -zxvf $distpath -C /tmp/
+    tar -zxf $distpath -C /tmp/
 	rm -f $distpath
 	sourcepath=$(find "/tmp/" -maxdepth 1 -type d -name "hbase*")
 	# we will build the source later
+  else
+    # use the dist binary
+	tar -zxf $distpath -C /opt/hbase
+    rm -f $distpath
   fi
 else
   # if the father docker has download the hbase source code, we use it directly.
@@ -56,11 +58,11 @@ else
 fi
 
 # build the binary by source
-if [ -d "$sourcepath" ]; then
+if [ ! -z ${sourcepath+x} ] && [ -d "$sourcepath" ]; then
   cd $sourcepath
   mvn clean install -DskipTests assembly:single
   binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
-  tar -zxvf $binarypath -C /opt/hbase
+  tar -zxf $binarypath -C /opt/hbase
   cd ~/
   rm -rf $sourcepath
 fi
