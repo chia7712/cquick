@@ -8,7 +8,7 @@ if [ ! -n "$BRANCH" ] || [ ! -n "$PROJECT" ]; then
   exit
 fi
 
-if [ "$PROJECT" != "kafka" ] || [ "$PROJECT" != "hbase" ]; then
+if [ "$PROJECT" != "kafka" ] && [ "$PROJECT" != "hbase" ]; then
   echo "Unsupported project:$PROJECT"
   exit
 fi
