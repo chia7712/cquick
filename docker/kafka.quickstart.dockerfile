@@ -9,3 +9,4 @@ ENV CQUICK_HOME=$COMPONENT_HOME/cquick
 ENV PATH=$PATH:$CQUICK_HOME/bin
 # TODO: use another name instead?
 ENV USER=root
+ENV PROJECT=kafka
