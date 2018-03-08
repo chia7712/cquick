@@ -36,10 +36,8 @@ else
     echo "no patch file"
   fi
   gradle
-  # pre-download all dependencies. Kafka use two repos so the tar build may fails if build choose the wrong repo
-  ./gradlew installAll
   ./gradlew clean
-  ./gradlew releaseTarGz
+  ./gradlew releaseTarGz -x signArchives
   filename=$(find "$KAFKA_SOURCE/core/build/distributions/" -type f -maxdepth 1 -name "*SNAPSHOT.tgz")
   tar -zxvf $filename -C /opt/kafka
 fi
