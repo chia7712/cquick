@@ -43,7 +43,7 @@ else
 fi
 
 # set kafka home
-KAFKA_ASSEMBLY=$(find "/opt/kafka" -maxdepth 1 -type d -name "/kafka*SNAPSHOT")
+KAFKA_ASSEMBLY=$(find "/opt/kafka" -maxdepth 1 -type d -name "kafka*SNAPSHOT")
 echo "[DEBUG] $KAFKA_ASSEMBLY"
 ln -s $KAFKA_ASSEMBLY /opt/kafka/default
 KAFKA_HOME=/opt/kafka/default
