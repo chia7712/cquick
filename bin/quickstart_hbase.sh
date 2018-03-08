@@ -19,27 +19,31 @@ ssh 0.0.0.0 -o StrictHostKeyChecking=no "export"
 # generate hbase binary
 mkdir /opt/hbase
 if [[ "${HBASE_BRANCH}" == http* ]]; then
-  distname=$(basename "$HBASE_BRANCH")
   wget $HBASE_BRANCH -P /tmp
+  distname=$(basename "$HBASE_BRANCH")
+  distpath=/tmp/$distname
   if [[ "${distname}" == *bin* ]]; then
-	tar -zxvf /tmp/$distname -C /opt/hbase
+	tar -zxvf $distpath -C /opt/hbase
   else
-    tar -zxvf $distname -C /tmp/
-	sourcename=$(find "/tmp/" -maxdepth 1 -type f -name "hbase*")
-	cd $sourcename
+    tar -zxvf $distpath -C /tmp/
+	sourcepath=$(find "/tmp/" -maxdepth 1 -type f -name "hbase*")
+	cd $sourcepath
 	mvn clean install -DskipTests assembly:single
-    filename=$(find "$sourcename/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
-    tar -zxvf $filename -C /opt/hbase
+    binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
+    tar -zxvf $binarypath -C /opt/hbase
   fi
-  rm -f /tmp/$distname
+  rm -f $distpath
 else
-  if [ ! -d "$HBASE_SOURCE" ]; then
-    mkdir $HBASE_SOURCE
-	git clone https://github.com/apache/hbase $HBASE_SOURCE
+  sourcepath=""
+  # if the father docker has download the hbase source code, we use it directly.
+  if [ -d "$HBASE_SOURCE" ]; then
+    sourcepath=$HBASE_SOURCE
+  else
+    sourcepath=/tmp/hbase
+	git clone https://github.com/apache/hbase $sourcepath
   fi
-  cd $HBASE_SOURCE
+  cd $sourcepath
   git checkout -- . | git clean -df
-  echo "checkout to $HBASE_BRANCH"
   git checkout $HBASE_BRANCH
   git pull
   if [ -f /testpatch/patch ]; then
@@ -49,8 +53,10 @@ else
     echo "no patch file"
   fi
   mvn clean install -DskipTests assembly:single
-  filename=$(find "$HBASE_SOURCE/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
-  tar -zxvf $filename -C /opt/hbase
+  binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
+  tar -zxvf $binarypath -C /opt/hbase
+  cd ~/
+  rm -rf $sourcepath
 fi
 
 # set hbase home
