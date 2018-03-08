@@ -28,12 +28,12 @@ if [[ "${KAFKA_BRANCH}" == http* ]]; then
   if [[ "${distname}" == *bin* ]]; then
     echo "[DEBUG] do binary"
     # use the dist binary
-	tar -zxvf $distpath -C /opt/kafka
+	tar -zxf $distpath -C /opt/kafka
     rm -f $distpath
   else
     echo "[DEBUG] do src"
     # prepare the source code
-    tar -zxvf $distpath -C /tmp/
+    tar -zxf $distpath -C /tmp/
 	rm -f $distpath
 	sourcepath=$(find "/tmp/" -maxdepth 1 -type d -name "kafka*")
 	# we will build the source later
@@ -75,7 +75,7 @@ if [ ! -z ${sourcepath+x} ] && [ -d "$sourcepath" ]; then
   ./gradlew releaseTarGz -x signArchives
   # kafak assembly includes the *site-docs*.tgz
   binarypath=$(find "$sourcepath/core/build/distributions/" -maxdepth 1 -type f -name "*.tgz" -not -path "*site*")
-  tar -zxvf $binarypath -C /opt/kafka
+  tar -zxf $binarypath -C /opt/kafka
   cd ~/
   rm -rf $sourcepath
 fi
