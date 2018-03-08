@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ ! -n "$HBASE_BRANCH" ]; then
-  echo "Define the HBASE_BRANCH. You can pass the url to source code also"
+  echo "Define the HBASE_BRANCH. You can pass the URL to source code also"
   exit
 fi
 # generate ssh key
@@ -24,7 +24,7 @@ if [[ "${HBASE_BRANCH}" == http* ]]; then
   tar -zxvf $filename -C /opt/hbase
   rm -f $filename
 else
-  cd /testpatch/hbase
+  cd $HBASE_SOURCE
   git checkout -- . | git clean -df
   echo "checkout to $HBASE_BRANCH"
   git checkout $HBASE_BRANCH
@@ -36,7 +36,7 @@ else
     echo "no patch file"
   fi
   mvn clean install -DskipTests assembly:single
-  filename=$(find "/testpatch/hbase/hbase-assembly/target/" -type f -maxdepth 1 -name "*.gz")
+  filename=$(find "$HBASE_SOURCE/hbase-assembly/target/" -type f -maxdepth 1 -name "*.gz")
   tar -zxvf $filename -C /opt/hbase
 fi
 
@@ -65,7 +65,13 @@ echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin:\$HBASE_HOME/bin" 
 mkdir $COMPONENT_HOME/hperf
 git clone https://github.com/chia7712/hperf.git $COMPONENT_HOME/hperf
 
-# deploy hadoop's config
+# deploy zookeeper config
+cp $HQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
+
+# start zookeeper
+$ZOOKEEPER_HOME/bin/zkServer.sh start
+
+# deploy hadoop config
 cp $HQUICK_HOME/conf/hadoop/* $HADOOP_HOME/etc/hadoop/
 
 # start hadoop
