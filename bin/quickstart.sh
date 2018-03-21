@@ -53,9 +53,10 @@ startKafka() {
   # deploy zookeeper config
   cp $CQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
 
+  mkdir /tmp/log
   # start zookeeper
   # make zookeeper log to /tmp
-  cd /tmp
+  cd /tmp/log
   $ZOOKEEPER_HOME/bin/zkServer.sh start
 
   # deploy zookeeper config
@@ -63,9 +64,9 @@ startKafka() {
 
   # START kafka
   # TODO: just run the kafka server in the background?
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server0.properties > /tmp/broker.log 2>&1 &
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server1.properties > /tmp/broker.log 2>&1 &
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /tmp/broker.log 2>&1 &
+  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server0.properties > /tmp/log/broker.log 2>&1 &
+  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server1.properties > /tmp/log/broker.log 2>&1 &
+  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /tmp/log/broker.log 2>&1 &
 }
 
 buildHBase() {
