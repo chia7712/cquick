@@ -4,6 +4,9 @@ FROM chia7712/kafka:base
 RUN mkdir $COMPONENT_HOME/cquick
 RUN git clone https://github.com/chia7712/cquick.git $COMPONENT_HOME/cquick
 
+# mkdir for kafka plugin
+RUN mkdir /opt/connector/plugins
+
 # Set ENV
 ENV CQUICK_HOME=$COMPONENT_HOME/cquick
 ENV PATH=$PATH:$CQUICK_HOME/bin
