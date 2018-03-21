@@ -63,9 +63,9 @@ startKafka() {
 
   # START kafka
   # TODO: just run the kafka server in the background?
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server0.properties > /dev/null 2>&1 &
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server1.properties > /dev/null 2>&1 &
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /dev/null 2>&1 &
+  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server0.properties > /tmp/broker.log 2>&1 &
+  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server1.properties > /tmp/broker.log 2>&1 &
+  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /tmp/broker.log 2>&1 &
 }
 
 buildHBase() {
