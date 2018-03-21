@@ -54,6 +54,8 @@ startKafka() {
   cp $CQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
 
   # start zookeeper
+  # make zookeeper log to /tmp
+  cd /tmp
   $ZOOKEEPER_HOME/bin/zkServer.sh start
 
   # deploy zookeeper config
