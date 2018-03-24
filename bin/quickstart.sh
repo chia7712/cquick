@@ -127,12 +127,14 @@ startHBase() {
   export HBASE_PID_DIR=/tmp/master
   $HBASE_HOME/bin/hbase-daemon.sh start master
   export HBASE_PID_DIR=/tmp/rs0
+  export HBASE_LOG_DIR=/opt/hbase/default/logs/rs0
   $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
     -Dhbase.regionserver.port=16020 \
 	-Dhbase.regionserver.info.port=16030 \
     -Dregionserver.rmi.registry.port=10102 \
 	-Dregionserver.rmi.connector.port=10102
   export HBASE_PID_DIR=/tmp/rs1
+  export HBASE_LOG_DIR=/opt/hbase/default/logs/rs1
   $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
     -Dhbase.regionserver.port=16021 \
 	-Dhbase.regionserver.info.port=16031 \
