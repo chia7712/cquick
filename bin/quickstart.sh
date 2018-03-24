@@ -144,8 +144,8 @@ startHBase() {
   export HBASE_LOG_DIR=/opt/hbase/default/logs/rs1
   export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Dcom.sun.management.jmxremote.rmi.port=10103"
   $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
-    -Dhbase.regionserver.port=16021 \
-	-Dhbase.regionserver.info.port=16031 \
+    -Dhbase.regionserver.port=16040 \
+	-Dhbase.regionserver.info.port=16050 \
     -Dregionserver.rmi.registry.port=10103 \
 	-Dregionserver.rmi.connector.port=10103
 }
