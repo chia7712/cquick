@@ -124,8 +124,20 @@ startHBase() {
   cp $CQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
 
   # start hbase
+  export HBASE_PID_DIR=/tmp/master
   $HBASE_HOME/bin/hbase-daemon.sh start master
-  $HBASE_HOME/bin/hbase-daemon.sh start regionserver
+  export HBASE_PID_DIR=/tmp/rs0
+  $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
+    -Dhbase.regionserver.port=16020 \
+	-Dhbase.regionserver.info.port=16030 \
+    -Dregionserver.rmi.registry.port=10102 \
+	-Dregionserver.rmi.connector.port=10102
+  export HBASE_PID_DIR=/tmp/rs1
+  $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
+    -Dhbase.regionserver.port=16021 \
+	-Dhbase.regionserver.info.port=16031 \
+    -Dregionserver.rmi.registry.port=10103 \
+	-Dregionserver.rmi.connector.port=10103
 }
 
 #------------------------------------[ok, all LGTM. Trying to build the services]------------------------------------#
