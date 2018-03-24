@@ -125,7 +125,13 @@ startHBase() {
 
   # start hbase
   export HBASE_PID_DIR=/tmp/master
-  $HBASE_HOME/bin/hbase-daemon.sh start master
+  export HBASE_LOG_DIR=/opt/hbase/default/logs/master
+  export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Dcom.sun.management.jmxremote.rmi.port=10101"
+  $HBASE_HOME/bin/hbase-daemon.sh start master \
+    -Dhbase.master.port=16000 \
+	-Dhbase.master.info.port=16010 \
+    -Dmaster.rmi.registry.port=10101 \
+	-Dmaster.rmi.connector.port=10101
   export HBASE_PID_DIR=/tmp/rs0
   export HBASE_LOG_DIR=/opt/hbase/default/logs/rs0
   export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Dcom.sun.management.jmxremote.rmi.port=10102"
