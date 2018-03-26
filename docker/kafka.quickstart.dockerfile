@@ -1,4 +1,4 @@
-FROM chia7712/kafka:base
+FROM chia7712/kafka:latest
 
 # CLONE cquick
 RUN mkdir $COMPONENT_HOME/cquick

@@ -1,4 +1,4 @@
-FROM chia7712/hbase:base
+FROM chia7712/hbase:latest
 
 # CLONE cquick
 RUN mkdir $COMPONENT_HOME/cquick
