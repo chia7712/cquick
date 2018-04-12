@@ -67,9 +67,28 @@ startKafka() {
 
   # START kafka
   # TODO: just run the kafka server in the background?
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server0.properties > /tmp/log/broker0.log 2>&1 &
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server1.properties > /tmp/log/broker1.log 2>&1 &
-  $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /tmp/log/broker2.log 2>&1 &
+  
+  END=NODE_COUNT_DEFAULT
+  if [ "$1" != "" ]; then
+    END=$1
+  fi
+  if [ "$END" -ge "$NODE_COUNT_MAX" ]; then
+    END=NODE_COUNT_MAX
+  fi
+  if [ "$END" -le "$NODE_COUNT_MIN" ]; then
+    END=NODE_COUNT_MIN
+  fi
+  index=0
+  brokerPort=9092
+  while [[ $index -lt $END ]]
+  do
+    cp $KAFKA_HOME/config/server.properties "$KAFKA_HOME/config/server$index.properties"
+	echo "broker.id=$index" >> "$KAFKA_HOME/config/server$index.properties"
+	echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
+    $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
+    ((index = index + 1))
+	((brokerPort = brokerPort + 1))
+  done
 }
 
 ##----------------[hbase functions]----------------##
