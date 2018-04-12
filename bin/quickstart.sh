@@ -32,8 +32,7 @@ NODE_COUNT_DEFAULT=2
 buildKafka() {
   sourcePath=$1
   gradle
-  ./gradlew clean
-  ./gradlew releaseTarGz -x signArchives -PscalaVersion=2.12
+  ./gradlew clean install releaseTarGz -x signArchives -PscalaVersion=2.12
   # kafak assembly includes the *site-docs*.tgz
   binarypath=$(find "$sourcepath/core/build/distributions/" -maxdepth 1 -type f -name "*.tgz" -not -path "*site*")
   tar -zxf $binarypath -C $BINARY_ROOT_FOLDER
