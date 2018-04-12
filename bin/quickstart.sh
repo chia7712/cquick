@@ -67,22 +67,22 @@ startKafka() {
 
   # START kafka
   # TODO: just run the kafka server in the background?
-  rmiPort=10110
+  rmiHostname=$2
   END=$1
   index=0
-  brokerPort=9092
-  rmi_hostname=$2
+  brokerPort=9090
+  jmxPort=9190
   while [[ $index -lt $END ]]
   do
-    export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$rmi_hostname -Dcom.sun.management.jmxremote.port=$rmiPort -Dcom.sun.management.jmxremote.rmi.port=$rmiPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+    export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$rmiHostname -Dcom.sun.management.jmxremote.port=$jmxPort -Dcom.sun.management.jmxremote.rmi.port=$jmxPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
     cp $KAFKA_HOME/config/server.properties "$KAFKA_HOME/config/server$index.properties"
 	echo "broker.id=$index" >> "$KAFKA_HOME/config/server$index.properties"
 	echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
 	echo "log.dirs=/tmp/kafka-logs-$index" >> "$KAFKA_HOME/config/server$index.properties"
     $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
-    ((index = index + 1))
-	((brokerPort = brokerPort + 1))
-	((rsInfoPort = rsInfoPort + 1))
+    index=index+1
+	brokerPort=brokerPort+1
+	jmxPort=jmxPort+1
   done
 }
 
@@ -148,37 +148,37 @@ startHBase() {
   cp $CQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
 
   # start hbase
-  rmi_hostname=$2
-
-  export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Djava.rmi.server.hostname=$rmi_hostname"
+  rmiHostname=$2
+  hbasePort=16000
+  hbaseWebPort=16100
+  jmxPort=16200
+  export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Djava.rmi.server.hostname=$rmiHostname"
   export HBASE_PID_DIR=/tmp/master
   export HBASE_LOG_DIR=/tmp/log/master
-
   $HBASE_HOME/bin/hbase-daemon.sh start master \
-    -Dhbase.master.port=16000 \
-	-Dhbase.master.info.port=16010 \
-    -Dmaster.rmi.registry.port=10100 \
-	-Dmaster.rmi.connector.port=10100
-
+    -Dhbase.master.port=$hbasePort \
+	-Dhbase.master.info.port=$hbaseWebPort \
+    -Dmaster.rmi.registry.port=$jmxPort \
+	-Dmaster.rmi.connector.port=$jmxPort
+  hbasePort=hbasePort+1
+  hbaseWebPort=hbaseWebPort+1
+  jmxPort=jmxPort+1
   END=$1
   index=0
-  rmiPort=10110
-  rsPort=16020
-  rsInfoPort=16030
   while [[ $index -lt $END ]]
   do
-    export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Djava.rmi.server.hostname=$rmi_hostname"
+    export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Djava.rmi.server.hostname=$rmiHostname"
     export HBASE_PID_DIR="/tmp/rs$index"
     export HBASE_LOG_DIR="/tmp/log/rs$index"
     $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
-      -Dhbase.regionserver.port=$rsPort \
-	  -Dhbase.regionserver.info.port=$rsInfoPort \
-      -Dregionserver.rmi.registry.port=$rmiPort \
-	  -Dregionserver.rmi.connector.port=$rmiPort
-    ((index = index + 1))
-	((rmiPort = rmiPort + 1))
-	((rsPort = rsPort + 1))
-	((rsInfoPort = rsInfoPort + 1))
+      -Dhbase.regionserver.port=$hbasePort \
+	  -Dhbase.regionserver.info.port=$hbaseWebPort \
+      -Dregionserver.rmi.registry.port=$jmxPort \
+	  -Dregionserver.rmi.connector.port=$jmxPort
+	index=index+1
+	hbasePort=hbasePort+1
+	hbaseWebPort=hbaseWebPort+1
+	jmxPort=jmxPort+1
   done
 }
 
@@ -250,17 +250,17 @@ if [ "$nodeCount" -lt "$NODE_COUNT_MIN" ]; then
   nodeCount=NODE_COUNT_MIN
 fi
 
-rmi_hostname=""
+rmiHostname=""
 if [ -z "$RMI_ADDRESS" ]; then
-  rmi_hostname="$HOSTNAME"
+  rmiHostname="$HOSTNAME"
 else
-  rmi_hostname="$RMI_ADDRESS"
+  rmiHostname="$RMI_ADDRESS"
 fi
 
 if [ "$PROJECT" == "kafka" ]; then
-  startKafka $nodeCount $rmi_hostname
+  startKafka $nodeCount $rmiHostname
 elif [ "$PROJECT" == "hbase" ]; then
-  startHBase $nodeCount $rmi_hostname
+  startHBase $nodeCount $rmiHostname
 else
   echo "Unsupported project"
   exit
