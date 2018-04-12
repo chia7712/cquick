@@ -165,6 +165,7 @@ startHBase() {
   do
     export HBASE_PID_DIR="/tmp/rs$index"
     export HBASE_LOG_DIR="/tmp/log/rs$index"
+	export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Dcom.sun.management.jmxremote.rmi.port=$rmiPort"
     $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
       -Dhbase.regionserver.port=$rsPort \
 	  -Dhbase.regionserver.info.port=$rsInfoPort \
