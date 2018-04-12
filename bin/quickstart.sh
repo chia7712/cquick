@@ -110,6 +110,10 @@ startHBase() {
   cp $CQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
 
   # start zookeeper
+  mkdir /tmp/log
+  # start zookeeper
+  # make zookeeper log to /tmp
+  cd /tmp/log
   $ZOOKEEPER_HOME/bin/zkServer.sh start
 
   # deploy hadoop config
@@ -125,29 +129,40 @@ startHBase() {
 
   # start hbase
   export HBASE_PID_DIR=/tmp/master
-  export HBASE_LOG_DIR=/opt/hbase/default/logs/master
+  export HBASE_LOG_DIR=/tmp/log/master
   export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Dcom.sun.management.jmxremote.rmi.port=10101"
   $HBASE_HOME/bin/hbase-daemon.sh start master \
     -Dhbase.master.port=16000 \
 	-Dhbase.master.info.port=16010 \
     -Dmaster.rmi.registry.port=10101 \
 	-Dmaster.rmi.connector.port=10101
-  export HBASE_PID_DIR=/tmp/rs0
-  export HBASE_LOG_DIR=/opt/hbase/default/logs/rs0
-  export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Dcom.sun.management.jmxremote.rmi.port=10102"
-  $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
-    -Dhbase.regionserver.port=16020 \
-	-Dhbase.regionserver.info.port=16030 \
-    -Dregionserver.rmi.registry.port=10102 \
-	-Dregionserver.rmi.connector.port=10102
-  export HBASE_PID_DIR=/tmp/rs1
-  export HBASE_LOG_DIR=/opt/hbase/default/logs/rs1
-  export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Dcom.sun.management.jmxremote.rmi.port=10103"
-  $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
-    -Dhbase.regionserver.port=16040 \
-	-Dhbase.regionserver.info.port=16050 \
-    -Dregionserver.rmi.registry.port=10103 \
-	-Dregionserver.rmi.connector.port=10103
+  END=3
+  LIMIT=10
+  if [ "$1" != "" ]; then
+    END=$1
+  fi
+  if [ "$END" -ge "$LIMIT" ]; then
+    END=10
+  fi
+  index=0
+  rsPort=16020
+  rsInfoPort=16030
+  rmiPort=10102
+  while [[ $index -lt $END ]]
+  do
+    export HBASE_PID_DIR="/tmp/rs$index"
+    export HBASE_LOG_DIR="/tmp/log/rs$index"
+    export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Dcom.sun.management.jmxremote.rmi.port=$rmiPort"
+    $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
+      -Dhbase.regionserver.port=$rsPort \
+	  -Dhbase.regionserver.info.port=$rsInfoPort \
+      -Dregionserver.rmi.registry.port=$rmiPort \
+	  -Dregionserver.rmi.connector.port=$rmiPort
+    ((index = index + 1))
+	((rmiPort = rmiPort + 1))
+	((rsPort = rsPort + 1))
+	((rsInfoPort = rsInfoPort + 1))
+  done
 }
 
 #------------------------------------[ok, all LGTM. Trying to build the services]------------------------------------#
@@ -209,7 +224,7 @@ fi
 if [ "$PROJECT" == "kafka" ]; then
   startKafka
 elif [ "$PROJECT" == "hbase" ]; then
-  startHBase
+  startHBase $1
 else
   echo "Unsupported project"
   exit
