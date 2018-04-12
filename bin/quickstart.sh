@@ -67,11 +67,13 @@ startKafka() {
 
   # START kafka
   # TODO: just run the kafka server in the background?
+  rmiPort=10110
   END=$1
   index=0
   brokerPort=9092
   while [[ $index -lt $END ]]
   do
+    export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$HOSTNAME -Dcom.sun.management.jmxremote.port=$rmiPort -Dcom.sun.management.jmxremote.rmi.port=$rmiPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
     cp $KAFKA_HOME/config/server.properties "$KAFKA_HOME/config/server$index.properties"
 	echo "broker.id=$index" >> "$KAFKA_HOME/config/server$index.properties"
 	echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
@@ -79,6 +81,7 @@ startKafka() {
     $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
     ((index = index + 1))
 	((brokerPort = brokerPort + 1))
+	((rsInfoPort = rsInfoPort + 1))
   done
 }
 
@@ -144,24 +147,24 @@ startHBase() {
   cp $CQUICK_HOME/conf/hbase/* $HBASE_HOME/conf/
 
   # start hbase
+
   export HBASE_PID_DIR=/tmp/master
   export HBASE_LOG_DIR=/tmp/log/master
-  export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Dcom.sun.management.jmxremote.rmi.port=10101"
   $HBASE_HOME/bin/hbase-daemon.sh start master \
     -Dhbase.master.port=16000 \
 	-Dhbase.master.info.port=16010 \
-    -Dmaster.rmi.registry.port=10101 \
-	-Dmaster.rmi.connector.port=10101
+    -Dmaster.rmi.registry.port=10100 \
+	-Dmaster.rmi.connector.port=10100
+  ((rsInfoPort = rsInfoPort + 1))
+  rmiPort=10110
   END=$1
   index=0
   rsPort=16020
   rsInfoPort=16030
-  rmiPort=10102
   while [[ $index -lt $END ]]
   do
     export HBASE_PID_DIR="/tmp/rs$index"
     export HBASE_LOG_DIR="/tmp/log/rs$index"
-    export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Dcom.sun.management.jmxremote.rmi.port=$rmiPort"
     $HBASE_HOME/bin/hbase-daemon.sh start regionserver \
       -Dhbase.regionserver.port=$rsPort \
 	  -Dhbase.regionserver.info.port=$rsInfoPort \
