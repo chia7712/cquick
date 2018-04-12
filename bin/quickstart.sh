@@ -80,9 +80,9 @@ startKafka() {
 	echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
 	echo "log.dirs=/tmp/kafka-logs-$index" >> "$KAFKA_HOME/config/server$index.properties"
     $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
-    index=index+1
-	brokerPort=brokerPort+1
-	jmxPort=jmxPort+1
+    ((index = index + 1))
+    ((brokerPort = brokerPort+ 1))
+    ((jmxPort = jmxPort + 1))
   done
 }
 
@@ -160,9 +160,10 @@ startHBase() {
 	-Dhbase.master.info.port=$hbaseWebPort \
     -Dmaster.rmi.registry.port=$jmxPort \
 	-Dmaster.rmi.connector.port=$jmxPort
-  hbasePort=hbasePort+1
-  hbaseWebPort=hbaseWebPort+1
-  jmxPort=jmxPort+1
+  ((hbasePort = hbasePort + 1))
+  ((hbaseWebPort = hbaseWebPort+ 1))
+  ((jmxPort = jmxPort + 1))
+
   END=$1
   index=0
   while [[ $index -lt $END ]]
@@ -175,10 +176,10 @@ startHBase() {
 	  -Dhbase.regionserver.info.port=$hbaseWebPort \
       -Dregionserver.rmi.registry.port=$jmxPort \
 	  -Dregionserver.rmi.connector.port=$jmxPort
-	index=index+1
-	hbasePort=hbasePort+1
-	hbaseWebPort=hbaseWebPort+1
-	jmxPort=jmxPort+1
+	((index = index + 1))
+	((hbasePort = hbasePort + 1))
+	((hbaseWebPort = hbaseWebPort+ 1))
+	((jmxPort = jmxPort + 1))
   done
 }
 
