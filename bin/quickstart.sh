@@ -67,17 +67,7 @@ startKafka() {
 
   # START kafka
   # TODO: just run the kafka server in the background?
-  
-  END=NODE_COUNT_DEFAULT
-  if [ "$1" != "" ]; then
-    END=$1
-  fi
-  if [ "$END" -ge "$NODE_COUNT_MAX" ]; then
-    END=NODE_COUNT_MAX
-  fi
-  if [ "$END" -le "$NODE_COUNT_MIN" ]; then
-    END=NODE_COUNT_MIN
-  fi
+  END=$1
   index=0
   brokerPort=9092
   while [[ $index -lt $END ]]
@@ -159,16 +149,7 @@ startHBase() {
 	-Dhbase.master.info.port=16010 \
     -Dmaster.rmi.registry.port=10101 \
 	-Dmaster.rmi.connector.port=10101
-  END=NODE_COUNT_DEFAULT
-  if [ "$1" != "" ]; then
-    END=$1
-  fi
-  if [ "$END" -ge "$NODE_COUNT_MAX" ]; then
-    END=NODE_COUNT_MAX
-  fi
-  if [ "$END" -le "$NODE_COUNT_MIN" ]; then
-    END=NODE_COUNT_MIN
-  fi
+  END=$1
   index=0
   rsPort=16020
   rsInfoPort=16030
@@ -245,11 +226,23 @@ if [ ! -z ${sourcepath+x} ] && [ -d "$sourcepath" ]; then
   fi
 fi
 
+# calculate the count of nodes
+nodeCount=$NODE_COUNT_DEFAULT
+# replace the default value only when the passed arg is integer
+if [ "$1" -eq "$1" ] 2>/dev/null; then
+  nodeCount=$1
+fi
+if [ "$nodeCount" -ge "$NODE_COUNT_MAX" ]; then
+  nodeCount=NODE_COUNT_MAX
+fi
+if [ "$nodeCount" -le "$NODE_COUNT_MIN" ]; then
+  nodeCount=NODE_COUNT_MIN
+fi
 
 if [ "$PROJECT" == "kafka" ]; then
-  startKafka
+  startKafka $nodeCount
 elif [ "$PROJECT" == "hbase" ]; then
-  startHBase $1
+  startHBase $nodeCount
 else
   echo "Unsupported project"
   exit
