@@ -75,6 +75,7 @@ startKafka() {
     cp $KAFKA_HOME/config/server.properties "$KAFKA_HOME/config/server$index.properties"
 	echo "broker.id=$index" >> "$KAFKA_HOME/config/server$index.properties"
 	echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
+	echo "log.dirs=/tmp/kafka-logs-$index" >> "$KAFKA_HOME/config/server$index.properties"
     $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
     ((index = index + 1))
 	((brokerPort = brokerPort + 1))
@@ -232,10 +233,10 @@ nodeCount=$NODE_COUNT_DEFAULT
 if [ "$1" -eq "$1" ] 2>/dev/null; then
   nodeCount=$1
 fi
-if [ "$nodeCount" -ge "$NODE_COUNT_MAX" ]; then
+if [ "$nodeCount" -gt "$NODE_COUNT_MAX" ]; then
   nodeCount=NODE_COUNT_MAX
 fi
-if [ "$nodeCount" -le "$NODE_COUNT_MIN" ]; then
+if [ "$nodeCount" -lt "$NODE_COUNT_MIN" ]; then
   nodeCount=NODE_COUNT_MIN
 fi
 
