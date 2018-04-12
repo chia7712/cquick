@@ -135,7 +135,9 @@ startHBase() {
 
   # start hadoop
   $HADOOP_HOME/bin/hdfs namenode -format
+  export HADOOP_LOG_DIR="/tmp/log/master"
   $HADOOP_HOME/sbin/hadoop-daemon.sh start namenode
+  export HADOOP_LOG_DIR="/tmp/log/datanode"
   $HADOOP_HOME/sbin/hadoop-daemon.sh start datanode
 
   # deploy hbase's config
