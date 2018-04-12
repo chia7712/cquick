@@ -22,10 +22,13 @@ if [ "$PROJECT" != "kafka" ] && [ "$PROJECT" != "hbase" ]; then
   echo "Unsupported project:$PROJECT"
   exit
 fi
-
 #------------------------------------[define the functions and arguments]------------------------------------#
 BINARY_ROOT_FOLDER="/opt/$PROJECT"
 HADOOP_BINARY_ROOT_FOLDER="/opt/hadoop"
+NODE_COUNT_MIN=1
+NODE_COUNT_MAX=5
+NODE_COUNT_DEFAULT=2
+##----------------[kafka functions]----------------##
 buildKafka() {
   sourcePath=$1
   gradle
@@ -69,6 +72,7 @@ startKafka() {
   $KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server2.properties > /tmp/log/broker2.log 2>&1 &
 }
 
+##----------------[hbase functions]----------------##
 buildHBase() {
   sourcePath=$1
   cd $sourcepath
@@ -136,13 +140,15 @@ startHBase() {
 	-Dhbase.master.info.port=16010 \
     -Dmaster.rmi.registry.port=10101 \
 	-Dmaster.rmi.connector.port=10101
-  END=3
-  LIMIT=10
+  END=NODE_COUNT_DEFAULT
   if [ "$1" != "" ]; then
     END=$1
   fi
-  if [ "$END" -ge "$LIMIT" ]; then
-    END=10
+  if [ "$END" -ge "$NODE_COUNT_MAX" ]; then
+    END=NODE_COUNT_MAX
+  fi
+  if [ "$END" -le "$NODE_COUNT_MIN" ]; then
+    END=NODE_COUNT_MIN
   fi
   index=0
   rsPort=16020
