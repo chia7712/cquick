@@ -27,18 +27,18 @@ The **quickstart.sh** will execute the following ops.
 1. deploy **1 namenode** instance and **1 datanode** instance
 1. deploy **1 master** instance
 1. generate the regionserver configs and deploy **2 regionserver instances**
- 
+
 ### Prerequisites
 
 * docker 1.13.1+ with overlay2 storage driver
 
 ### Installing
 
-##### for kafka
+*kafka*
 ```
 $ docker pull chia7712/kafka:quickstart
 ```
-##### for hbase
+*hbase*
 ```
 $ docker pull chia7712/hbase:quickstart
 ```
@@ -47,22 +47,24 @@ There are some options configurable to user.
 
 ### how to change the code
 You can run the service based on the git revision, release src or release binary.
-##### example 1: run the hbase service based on branch-1
+
+*example 1: run the hbase service based on branch-1*
 ```
 $ docker run -e "branch=branch-1" chia7712/hbase:quickstart quickstart.sh
 ```
-##### example 2: run the hbase service based on hbase-1.4.3 src
+*example 2: run the hbase service based on hbase-1.4.3 src*
 ```
 $ docker run -e "branch=https://www.apache.org/dist/hbase/1.4.3/hbase-1.4.3-src.tar.gz" chia7712/hbase:quickstart quickstart.sh
 ```
-##### example 3: run the hbase service based on hbase-1.4.3 binary
+*example 3: run the hbase service based on hbase-1.4.3 binary*
 ```
 $ docker run -e "branch=https://www.apache.org/dist/hbase/1.4.3/hbase-1.4.3-bin.tar.gz" chia7712/hbase:quickstart quickstart.sh
 ```
 
 ### how to apply the patch to the code
 You can define the patch applying to the code before building and running
-##### example 1: run the hbase service based on master and patch
+
+*example 1: run the hbase service based on master and patch*
 ```
 $ docker run -e "branch=master" -v mypatch:/testpatch/patch chia7712/hbase:quickstart quickstart.sh
 ```
@@ -72,33 +74,46 @@ The quickstart.sh will check the exist of /testpatch/patch, and then apply it to
 
 ### how to increase the running node
 You can define the number of running regionserver|broker nodes. The min is 1 and max is 5.
-##### example 1: run the hbase service with 3 regionserver nodes
+
+*example 1: run the hbase service with 3 regionserver nodes*
 ```
 $ docker run -e "branch=branch-1" chia7712/hbase:quickstart quickstart.sh 3
 ```
-##### example 2: run the kafka service with 3 kafka brokers
+*example 2: run the kafka service with 3 kafka brokers*
 ```
 $ docker run -e "branch=trunk" chia7712/kafka:quickstart quickstart.sh 3
 ```
+### how to increase the heap size
+You can change the heap size to JVM though setting the following environment variable
+
+*kafka*
+
 
 ## Auto-generated configuration
 The quickstart.sh auto-generate the configuration when starting the service.
 
-##### for zookeeper
+*zookeeper*
 * dataDir=/tmp/zookeeper
 * log=/tmp/log/zookeeper.out
 
-##### for kafka
+*kafka*
+* HEAP_SIZE=512M
 * id=$node_index
 * listeners=PLAINTEXT://:(9092+$node_index)
 * log.dirs=/tmp/kafka-logs-$index
 * broker.log=/tmp/log/broker$node_index.log
 
-##### for hadoop
+*Hadoop namenode*
+* HEAP_SIZE=1G
+* HADOOP_LOG_DIR=/tmp/log/namenode
 
-##### for hbase
+*Hadoop datanode*
+* HEAP_SIZE=2G
+* HADOOP_LOG_DIR=/tmp/log/datanode
+* data folder=/tmp/
 
-###### master
+*hbase master*
+* HEAP_SIZE=1G
 * HBASE_PID_DIR=/tmp/master
 * HBASE_LOG_DIR=/tmp/log/master
 * com.sun.management.jmxremote.rmi.port=10101
@@ -107,7 +122,8 @@ The quickstart.sh auto-generate the configuration when starting the service.
 * hbase.master.port=16000
 * hbase.master.info.port=16010
 
-###### regionserver
+*hbase regionserver*
+* HEAP_SIZE=1G
 * HBASE_PID_DIR=/tmp/rs$node_index
 * HBASE_LOG_DIR=/tmp/log/rs$node_index
 * com.sun.management.jmxremote.rmi.port=(10102+$node_index)
@@ -123,6 +139,7 @@ The quickstart.sh auto-generate the configuration when starting the service.
 * HADOOP_HOME=/opt/hadoop/default
 * HBASE_HOME=/opt/hbase/default
 
+**NOTE:** The log of all instances are stored in /tmp/log 
 
 ## Authors
 * **Chia-Ping Tsai (chia7712@is-land.com.tw)**
