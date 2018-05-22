@@ -76,7 +76,7 @@ startKafka() {
   do
     export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$rmiHostname -Dcom.sun.management.jmxremote.port=$jmxPort -Dcom.sun.management.jmxremote.rmi.port=$jmxPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
     cp $KAFKA_HOME/config/server.properties "$KAFKA_HOME/config/server$index.properties"
-    echo "broker.id=broker-$index" >> "$KAFKA_HOME/config/server$index.properties"
+    echo "broker.id=$index" >> "$KAFKA_HOME/config/server$index.properties"
     echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
     echo "log.dirs=/tmp/kafka-logs-$index" >> "$KAFKA_HOME/config/server$index.properties"
     $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
