@@ -6,7 +6,7 @@ All related projects and configs have been stored in the docker containers. All 
 
 *kafka*
 ```
-$ docker run -e "branch=trunk" chia7712/kafka:quickstart quickstart.sh
+$ docker run -e "BRANCH=trunk" chia7712/kafka:quickstart quickstart.sh
 ```
 The **quickstart.sh** will execute the following ops.
 1. download the **kafka** source code from https://github.com/apache/kafka
@@ -17,7 +17,7 @@ The **quickstart.sh** will execute the following ops.
  
 *hbase*
 ```
-$ docker run -e "branch=master" chia7712/hbase:quickstart quickstart.sh
+$ docker run -e "BRANCH=master" chia7712/hbase:quickstart quickstart.sh
 ```
 The **quickstart.sh** will execute the following ops.
 1. download the **hbase** source code from https://github.com/apache/hbase
@@ -51,15 +51,15 @@ You can run the service based on the git revision, release src or release binary
 
 *example 1: run the hbase service based on branch-1*
 ```
-$ docker run -e "branch=branch-1" chia7712/hbase:quickstart quickstart.sh
+$ docker run -e "BRANCH=branch-1" chia7712/hbase:quickstart quickstart.sh
 ```
 *example 2: run the hbase service based on hbase-1.4.3 src*
 ```
-$ docker run -e "branch=https://www.apache.org/dist/hbase/1.4.3/hbase-1.4.3-src.tar.gz" chia7712/hbase:quickstart quickstart.sh
+$ docker run -e "BRANCH=https://www.apache.org/dist/hbase/1.4.3/hbase-1.4.3-src.tar.gz" chia7712/hbase:quickstart quickstart.sh
 ```
 *example 3: run the hbase service based on hbase-1.4.3 binary*
 ```
-$ docker run -e "branch=https://www.apache.org/dist/hbase/1.4.3/hbase-1.4.3-bin.tar.gz" chia7712/hbase:quickstart quickstart.sh
+$ docker run -e "BRANCH=https://www.apache.org/dist/hbase/1.4.3/hbase-1.4.3-bin.tar.gz" chia7712/hbase:quickstart quickstart.sh
 ```
 
 ### How to apply the patch to the code
@@ -67,7 +67,7 @@ You can define the patch applying to the code before building and running
 
 *example 1: run the hbase service based on master and patch*
 ```
-$ docker run -e "branch=master" -v mypatch:/testpatch/patch chia7712/hbase:quickstart quickstart.sh
+$ docker run -e "BRANCH=master" -v mypatch:/testpatch/patch chia7712/hbase:quickstart quickstart.sh
 ```
 The quickstart.sh will check the exist of /testpatch/patch, and then apply it to the source code.
 
@@ -78,11 +78,11 @@ You can define the number of running regionserver|broker nodes. The min is 1 and
 
 *example 1: run the hbase service with 3 regionserver nodes*
 ```
-$ docker run -e "branch=branch-1" chia7712/hbase:quickstart quickstart.sh 3
+$ docker run -e "BRANCH=branch-1" chia7712/hbase:quickstart quickstart.sh 3
 ```
 *example 2: run the kafka service with 3 kafka brokers*
 ```
-$ docker run -e "branch=trunk" chia7712/kafka:quickstart quickstart.sh 3
+$ docker run -e "BRANCH=trunk" chia7712/kafka:quickstart quickstart.sh 3
 ```
 ### How to increase the heap size
 You can change the heap size of JVM through adding the following environment variable to docker command
