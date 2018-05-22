@@ -95,7 +95,7 @@ startKafka() {
     export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$rmiHostname -Dcom.sun.management.jmxremote.port=$jmxPort -Dcom.sun.management.jmxremote.rmi.port=$jmxPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
     cp $KAFKA_HOME/config/connect-distributed.properties "$KAFKA_HOME/config/connect-distributed$index.properties"
     echo "bootstrap.servers=$brokerList" >> "$KAFKA_HOME/config/connect-distributed$index.properties"
-    echo "rest.port=$index" >> "$KAFKA_HOME/config/connect-distributed$index.properties"
+    echo "rest.port=$workerPort" >> "$KAFKA_HOME/config/connect-distributed$index.properties"
     $KAFKA_HOME/bin/connect-distributed.sh "$KAFKA_HOME/config/connect-distributed$index.properties" > "/tmp/log/worker$index.log" 2>&1 &
     ((index = index + 1))
     ((workerPort = workerPort+ 1))
