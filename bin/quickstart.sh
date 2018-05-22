@@ -80,7 +80,7 @@ startKafka() {
 	echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
 	echo "log.dirs=/tmp/kafka-logs-$index" >> "$KAFKA_HOME/config/server$index.properties"
     $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
-    brokerList=$brokerList",localhost$brokerPort"
+    brokerList=$brokerList",localhost:$brokerPort"
     ((index = index + 1))
     ((brokerPort = brokerPort+ 1))
     ((jmxPort = jmxPort + 1))
