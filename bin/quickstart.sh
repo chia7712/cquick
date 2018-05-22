@@ -64,13 +64,14 @@ startKafka() {
   # deploy zookeeper config
   cp $CQUICK_HOME/conf/kafka/* $KAFKA_HOME/config/
 
-  # START kafka
+  # START kafka brokers
   # TODO: just run the kafka server in the background?
   rmiHostname=$2
   END=$1
   index=0
   brokerPort=9090
   jmxPort=9190
+  brokerList=""
   while [[ $index -lt $END ]]
   do
     export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$rmiHostname -Dcom.sun.management.jmxremote.port=$jmxPort -Dcom.sun.management.jmxremote.rmi.port=$jmxPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
@@ -79,8 +80,25 @@ startKafka() {
 	echo "listeners=PLAINTEXT://:$brokerPort" >> "$KAFKA_HOME/config/server$index.properties"
 	echo "log.dirs=/tmp/kafka-logs-$index" >> "$KAFKA_HOME/config/server$index.properties"
     $KAFKA_HOME/bin/kafka-server-start.sh "$KAFKA_HOME/config/server$index.properties" > "/tmp/log/broker$index.log" 2>&1 &
+    brokerList=$brokerList",localhost$brokerPort"
     ((index = index + 1))
     ((brokerPort = brokerPort+ 1))
+    ((jmxPort = jmxPort + 1))
+  done
+
+  # START kafka wokrers
+  index=0
+  workerPort=10090
+  jmxPort=10190
+  while [[ $index -lt $END ]]
+  do
+    export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$rmiHostname -Dcom.sun.management.jmxremote.port=$jmxPort -Dcom.sun.management.jmxremote.rmi.port=$jmxPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+    cp $KAFKA_HOME/config/connect-distributed.properties "$KAFKA_HOME/config/connect-distributed$index.properties"
+    echo "bootstrap.servers=$brokerList" >> "$KAFKA_HOME/config/connect-distributed$index.properties"
+    echo "rest.port=$index" >> "$KAFKA_HOME/config/connect-distributed$index.properties"
+    $KAFKA_HOME/bin/connect-distributed.sh "$KAFKA_HOME/config/connect-distributed$index.properties" > "/tmp/log/worker$index.log" 2>&1 &
+    ((index = index + 1))
+    ((workerPort = workerPort+ 1))
     ((jmxPort = jmxPort + 1))
   done
 }
