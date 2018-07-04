@@ -54,6 +54,7 @@ startKafka() {
 
   # deploy zookeeper config
   cp $CQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
+  echo "clientPort=$3" >> $ZOOKEEPER_HOME/conf/zoo.cfg
 
   mkdir /tmp/log
   # start zookeeper
@@ -69,8 +70,8 @@ startKafka() {
   rmiHostname=$2
   END=$1
   index=0
-  brokerPort=9090
-  jmxPort=9190
+  brokerPort=$4
+  jmxPort=$5
   brokerList=""
   while [[ $index -lt $END ]]
   do
@@ -88,8 +89,8 @@ startKafka() {
 
   # START kafka wokrers
   index=0
-  workerPort=10090
-  jmxPort=10190
+  workerPort=$6
+  jmxPort=$7
   while [[ $index -lt $END ]]
   do
     export KAFKA_JMX_OPTS="-Djava.rmi.server.hostname=$rmiHostname -Dcom.sun.management.jmxremote.port=$jmxPort -Dcom.sun.management.jmxremote.rmi.port=$jmxPort -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
@@ -144,6 +145,7 @@ startHBase() {
 
   # deploy zookeeper config
   cp $CQUICK_HOME/conf/zookeeper/* $ZOOKEEPER_HOME/conf/
+  echo "clientPort=$3" >> $ZOOKEEPER_HOME/conf/zoo.cfg
 
   # start zookeeper
   mkdir /tmp/log
@@ -167,9 +169,9 @@ startHBase() {
 
   # start hbase
   rmiHostname=$2
-  hbasePort=16000
-  hbaseWebPort=16100
-  jmxPort=16200
+  hbasePort=$4
+  hbaseWebPort=$5
+  jmxPort=$6
   export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Djava.rmi.server.hostname=$rmiHostname"
   export HBASE_PID_DIR=/tmp/master
   export HBASE_LOG_DIR=/tmp/log/master
@@ -276,10 +278,59 @@ else
   rmiHostname="$RMI_ADDRESS"
 fi
 
+zkPort=""
+if [ -z "$ZK_PORT" ]; then
+  zkPort="2181"
+else
+  zkPort="$ZK_PORT"
+fi
+
 if [ "$PROJECT" == "kafka" ]; then
-  startKafka $nodeCount $rmiHostname
+  brokerPort=""
+  if [ -z "$BROKER_PORT" ]; then
+    brokerPort="9090"
+  else
+    brokerPort="$BROKER_PORT"
+  fi
+  brokerJmxPort=""
+  if [ -z "$BROKER_JMX_PORT" ]; then
+    brokerJmxPort="9190"
+  else
+    brokerJmxPort="$BROKER_JMX_PORT"
+  fi
+  workerPort=""
+  if [ -z "$WORKER_PORT" ]; then
+    workerPort="10090"
+  else
+    workerPort="$WORKER_PORT"
+  fi
+  workerJmxPort=""
+  if [ -z "$WORKER_JMX_PORT" ]; then
+    workerJmxPort="10190"
+  else
+    workerJmxPort="$WORKER_JMX_PORT"
+  fi
+  startKafka $nodeCount $rmiHostname $zkPort $brokerPort $brokerJmxPort $workerPort $workerJmxPort
 elif [ "$PROJECT" == "hbase" ]; then
-  startHBase $nodeCount $rmiHostname
+  hbasePort=""
+  if [ -z "$HBASE_PORT" ]; then
+    hbasePort="16000"
+  else
+    hbasePort="$HBASE_PORT"
+  fi
+  hbaseWebPort=""
+  if [ -z "$HBASE_WEB_PORT" ]; then
+    hbaseWebPort="16100"
+  else
+    hbaseWebPort="$HBASE_WEB_PORT"
+  fi
+  hbaseJmxPort=""
+  if [ -z "$HBASE_JMX_PORT" ]; then
+    hbaseJmxPort="16200"
+  else
+    hbaseJmxPort="$HBASE_JMX_PORT"
+  fi
+  startHBase $nodeCount $rmiHostname $zkPort $hbasePort $hbaseWebPort $hbaseJmxPort
 else
   echo "Unsupported project"
   exit
