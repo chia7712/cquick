@@ -110,7 +110,8 @@ buildHBase() {
   sourcePath=$1
   cd $sourcepath
   mvn clean install -DskipTests assembly:single
-  binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz")
+  # hbase 3.0+ have extra assembly file used for client so we have to exclude the such file
+  binarypath=$(find "$sourcepath/hbase-assembly/target/" -maxdepth 1 -type f -name "*.gz" -a ! -name '*client*')
   tar -zxf $binarypath -C $BINARY_ROOT_FOLDER
   cd ~/
   rm -rf $sourcepath
